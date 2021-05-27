@@ -1,9 +1,34 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .roi_layers import ROIAlign, ROIPool
+#from .roi_layers import ROIAlign, ROIPool
+from torchvision.ops import roi_align
+from torchvision.ops import roi_pool
 from utils.util import *
 from utils.bilinear import *
+
+
+class ROIAlign(nn.Module):
+    def __init__(self, output_size, spatial_scale, sampling_ratio):
+        super(ROIAlign, self).__init__()
+        self.output_size = output_size
+        self.spatial_scale = spatial_scale
+        self.sampling_ratio = sampling_ratio
+
+    def forward(self, input, rois):
+        return roi_align(
+            input, rois, self.output_size, self.spatial_scale, self.sampling_ratio
+        )
+
+
+class ROIPool(nn.Module):
+    def __init__(self, output_size, spatial_scale):
+        super(ROIPool, self).__init__()
+        self.output_size = output_size
+        self.spatial_scale = spatial_scale
+
+    def forward(self, input, rois):
+        return roi_pool(input, rois, self.output_size, self.spatial_scale)
 
 
 def conv2d(in_feat, out_feat, kernel_size=3, stride=1, pad=1, spectral_norm=True):
